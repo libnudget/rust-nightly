@@ -27,6 +27,14 @@ on:
         type: boolean
         default: false
         description: Run benchmarks
+      create-release:
+        type: boolean
+        default: false
+        description: Create draft release
+      release-tag:
+        type: string
+        default: nightly
+        description: Release tag prefix
       codecov-token:
         type: string
         required: false
@@ -69,6 +77,18 @@ jobs:
 
     - name: Build release
       run: cargo build ${{ inputs.build-flags }} --verbose
+
+    - name: Create draft release
+      if: inputs.create-release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        name: ${{ inputs.release-tag }}-${{ github.sha }}
+        tag_name: ${{ inputs.release-tag }}-${{ github.sha }}
+        files: |
+          target/release/harper
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
 
     - name: Run benchmarks
       if: inputs.run-benchmarks
