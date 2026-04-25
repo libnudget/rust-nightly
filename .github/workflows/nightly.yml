@@ -10,7 +10,7 @@ on:
       rust-version:
         type: string
         default: stable
-        description: Rust toolchain version
+        description: Rust toolchain (e.g. stable, nightly, 1.75.0)
       toolchain-components:
         type: string
         default: rustfmt,clippy
@@ -56,7 +56,7 @@ jobs:
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@master
       with:
-        rust: ${{ inputs.rust-version }}
+        toolchain: ${{ inputs.rust-version }}
         components: ${{ inputs.toolchain-components }}
 
     - name: Cache Rust dependencies
