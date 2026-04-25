@@ -27,8 +27,8 @@ on:
         type: boolean
         default: false
         description: Run benchmarks
-    secrets:
       codecov-token:
+        type: string
         required: false
         description: Codecov token
 
@@ -75,7 +75,7 @@ jobs:
       run: cargo bench --all-features --workspace
 
     - name: Upload coverage
-      if: secrets.codecov-token
+      if: inputs.codecov-token != ''
       uses: codecov/codecov-action@v4
       with:
-        token: ${{ secrets.codecov-token }}
+        token: ${{ inputs.codecov-token }}
