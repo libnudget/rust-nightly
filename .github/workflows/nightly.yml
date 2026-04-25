@@ -87,6 +87,8 @@ jobs:
         tag_name: ${{ inputs.release-tag }}-${{ github.sha }}
         files: |
           target/release/harper
+          bazel-bin/harper
+          bazel-bin/harper-ui/harper
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
