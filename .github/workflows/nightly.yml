@@ -1,0 +1,81 @@
+# Copyright 2026 libnudget
+#
+# Licensed under the Apache License, Version 2.0
+
+name: Nightly
+
+on:
+  workflow_call:
+    inputs:
+      rust-version:
+        type: string
+        default: stable
+        description: Rust toolchain version
+      toolchain-components:
+        type: string
+        default: rustfmt,clippy
+        description: Rust components to install
+      test-flags:
+        type: string
+        default: --all-features --workspace
+        description: cargo test flags
+      build-flags:
+        type: string
+        default: --release --all-features --workspace
+        description: cargo build flags
+      run-benchmarks:
+        type: boolean
+        default: false
+        description: Run benchmarks
+    secrets:
+      codecov-token:
+        required: false
+        description: Codecov token
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUST_BACKTRACE: short
+  RUSTFLAGS: "-D warnings"
+  RUSTUP_MAX_RETRIES: 10
+
+jobs:
+  nightly:
+    name: nightly-checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential pkg-config libsqlite3-dev
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        rust: ${{ inputs.rust-version }}
+        components: ${{ inputs.toolchain-components }}
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Run tests
+      run: cargo test ${{ inputs.test-flags }} --verbose
+      env:
+        RUST_LOG: debug
+
+    - name: Build release
+      run: cargo build ${{ inputs.build-flags }} --verbose
+
+    - name: Run benchmarks
+      if: inputs.run-benchmarks
+      run: cargo bench --all-features --workspace
+
+    - name: Upload coverage
+      if: secrets.codecov-token
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.codecov-token }}
