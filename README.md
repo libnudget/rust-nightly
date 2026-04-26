@@ -8,6 +8,7 @@ Reusable GitHub Action workflow for nightly Rust builds.
 - Builds in release mode
 - Optional: run benchmarks
 - Optional: upload coverage to Codecov
+- Optional: create draft release
 
 ## Usage
 
@@ -24,9 +25,8 @@ jobs:
     uses: libnudget/rust-nightly/.github/workflows/nightly.yml@main
     with:
       rust-version: stable
-      run-benchmarks: true
-    secrets:
-      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+      create-release: true
+      release-tag: nightly
 ```
 
 ## Inputs
@@ -38,12 +38,9 @@ jobs:
 | `test-flags` | string | `--all-features --workspace` | cargo test flags |
 | `build-flags` | string | `--release --all-features --workspace` | cargo build flags |
 | `run-benchmarks` | boolean | `false` | Run benchmarks |
-
-## Secrets
-
-| Name | Required | Description |
-|------|----------|-------------|
-| `codecov-token` | false | Codecov upload token |
+| `create-release` | boolean | `false` | Create draft release |
+| `release-tag` | string | `nightly` | Release tag prefix |
+| `codecov-token` | string | - | Codecov token |
 
 ## License
 
