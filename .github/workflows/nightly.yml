@@ -30,15 +30,11 @@ on:
       create-release:
         type: boolean
         default: false
-        description: Create draft release
+        description: Create release
       release-tag:
         type: string
         default: nightly
         description: Release tag prefix
-      release-draft:
-        type: boolean
-        default: true
-        description: Create as draft release
       release-prerelease:
         type: boolean
         default: false
@@ -86,11 +82,12 @@ jobs:
     - name: Build release
       run: cargo build ${{ inputs.build-flags }} --verbose
 
-    - name: Create release
+    - name: Create draft release
       if: inputs.create-release
+      id: create-release
       uses: softprops/action-gh-release@v2
       with:
-        draft: ${{ inputs.release-draft || inputs.release-prerelease }}
+        draft: true
         prerelease: ${{ inputs.release-prerelease }}
         name: ${{ inputs.release-tag }}-${{ github.sha }}
         tag_name: ${{ inputs.release-tag }}-${{ github.sha }}
@@ -100,6 +97,13 @@ jobs:
           bazel-bin/harper-ui/harper
       env:
         GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Publish release
+      if: inputs.create-release
+      run: |
+        gh release edit ${{ inputs.release-tag }}-${{ github.sha }} --draft=false
+      env:
+        GH_TOKEN: ${{ github.token }}
 
     - name: Run benchmarks
       if: inputs.run-benchmarks
