@@ -90,7 +90,7 @@ jobs:
       if: inputs.create-release
       uses: softprops/action-gh-release@v2
       with:
-        draft: ${{ inputs.release-draft }}
+        draft: ${{ inputs.release-draft || inputs.release-prerelease }}
         prerelease: ${{ inputs.release-prerelease }}
         name: ${{ inputs.release-tag }}-${{ github.sha }}
         tag_name: ${{ inputs.release-tag }}-${{ github.sha }}
