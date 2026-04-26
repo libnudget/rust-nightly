@@ -35,6 +35,14 @@ on:
         type: string
         default: nightly
         description: Release tag prefix
+      release-draft:
+        type: boolean
+        default: true
+        description: Create as draft release
+      release-prerelease:
+        type: boolean
+        default: false
+        description: Mark as prerelease
       codecov-token:
         type: string
         required: false
@@ -78,11 +86,12 @@ jobs:
     - name: Build release
       run: cargo build ${{ inputs.build-flags }} --verbose
 
-    - name: Create draft release
+    - name: Create release
       if: inputs.create-release
       uses: softprops/action-gh-release@v2
       with:
-        draft: true
+        draft: ${{ inputs.release-draft }}
+        prerelease: ${{ inputs.release-prerelease }}
         name: ${{ inputs.release-tag }}-${{ github.sha }}
         tag_name: ${{ inputs.release-tag }}-${{ github.sha }}
         files: |
